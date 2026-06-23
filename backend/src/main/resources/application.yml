@@ -42,3 +42,8 @@ management:
   endpoint:
     health:
       show-details: always
+
+app:
+  jwt:
+    secret: "partnerflow-local-development-secret-key-should-be-at-least-256-bits"
+    expiration-minutes: 30
