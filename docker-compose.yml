@@ -1,0 +1,27 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: partnerflow-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: partnerflow_db
+      POSTGRES_USER: partnerflow_user
+      POSTGRES_PASSWORD: partnerflow_password
+    ports:
+      - "5433:5432"
+    volumes:
+      - partnerflow_postgres_data:/var/lib/postgresql/data
+
+  activemq:
+    image: apache/activemq-classic:5.18.7
+    container_name: partnerflow-activemq
+    restart: unless-stopped
+    environment:
+      ACTIVEMQ_ADMIN_LOGIN: admin
+      ACTIVEMQ_ADMIN_PASSWORD: admin
+    ports:
+      - "61616:61616"
+      - "8161:8161"
+
+volumes:
+  partnerflow_postgres_data:
