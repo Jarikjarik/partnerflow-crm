@@ -5,6 +5,7 @@ import com.yaroslav.partnerflow.auth.dto.LoginRequest;
 import com.yaroslav.partnerflow.auth.dto.RegisterPartnerRequest;
 import com.yaroslav.partnerflow.auth.security.UserPrincipal;
 import com.yaroslav.partnerflow.auth.token.JwtService;
+import com.yaroslav.partnerflow.common.exception.EmailAlreadyExistsException;
 import com.yaroslav.partnerflow.partner.entity.PartnerProfile;
 import com.yaroslav.partnerflow.partner.entity.PartnerStatus;
 import com.yaroslav.partnerflow.partner.repository.PartnerProfileRepository;
@@ -32,7 +33,7 @@ public class AuthService {
     @Transactional
     public AuthResponse registerPartner(RegisterPartnerRequest request) {
         if (userRepository.existsByEmailIgnoreCase(request.email())) {
-            throw new IllegalArgumentException("User with this email already exists");
+            throw new EmailAlreadyExistsException(request.email());
         }
 
         User user = new User();
