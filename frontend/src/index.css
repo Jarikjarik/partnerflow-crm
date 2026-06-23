@@ -281,4 +281,28 @@ button {
   .metric-card.wide {
     grid-column: span 1;
   }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 92px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: #eef2ff;
+    color: #1f3fff;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+  }
+
+  .status-won {
+    background: #ecfdf3;
+    color: #067647;
+  }
+
+  .status-lost {
+    background: #fff0f0;
+    color: #b42318;
+  }
 }

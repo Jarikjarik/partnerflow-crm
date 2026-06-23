@@ -25,6 +25,14 @@ export function AppLayout() {
                     <NavLink to="/" end>
                         Dashboard
                     </NavLink>
+
+                    <NavLink to="/clients">
+                        Clients
+                    </NavLink>
+
+                    <NavLink to="/deals">
+                        Deals
+                    </NavLink>
                 </nav>
 
                 <div className="sidebar-user">
