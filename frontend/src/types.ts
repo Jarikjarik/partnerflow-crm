@@ -64,3 +64,17 @@ export interface ClientResponse {
     createdAt: string;
     updatedAt: string;
 }
+
+export interface PartnerCommissionResponse {
+    id: number;
+    partnerId: number;
+    partnerEmail: string;
+    dealId: number;
+    dealTitle: string;
+    amount: number;
+    percent: number;
+    status: string;
+    calculatedAt: string;
+    approvedAt: string | null;
+    paidAt: string | null;
+}

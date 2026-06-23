@@ -33,6 +33,10 @@ export function AppLayout() {
                     <NavLink to="/deals">
                         Deals
                     </NavLink>
+
+                    <NavLink to="/commissions">
+                        Commissions
+                    </NavLink>
                 </nav>
 
                 <div className="sidebar-user">

@@ -6,6 +6,7 @@ import { LoginPage } from "./pages/LoginPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { ClientsPage } from "./pages/ClientsPage";
 import { DealsPage } from "./pages/DealsPage";
+import { CommissionsPage } from "./pages/CommissionsPage";
 
 export default function App() {
     return (
@@ -25,6 +26,7 @@ export default function App() {
                         <Route index element={<DashboardPage />} />
                         <Route path="clients" element={<ClientsPage />} />
                         <Route path="deals" element={<DealsPage />} />
+                        <Route path="commissions" element={<CommissionsPage />} />
                     </Route>
                 </Routes>
             </AuthProvider>
