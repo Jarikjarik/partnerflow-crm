@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface DealStatusRepository extends JpaRepository<DealStatus, Long> {
 
-    Optional<DealStatus> findByCode(String code);
+    Optional<DealStatus> findByCodeIgnoreCase(String code);
 
     List<DealStatus> findByActiveTrueOrderBySortOrderAsc();
 }
