@@ -2,6 +2,7 @@ package com.yaroslav.partnerflow.deal.service;
 
 import com.yaroslav.partnerflow.audit.service.AuditService;
 import com.yaroslav.partnerflow.auth.security.UserPrincipal;
+import com.yaroslav.partnerflow.billing.event.BillingEventPublisher;
 import com.yaroslav.partnerflow.client.entity.Client;
 import com.yaroslav.partnerflow.client.repository.ClientRepository;
 import com.yaroslav.partnerflow.common.exception.ResourceNotFoundException;
@@ -38,6 +39,7 @@ public class DealService {
     private final PartnerProfileRepository partnerProfileRepository;
     private final UserRepository userRepository;
     private final AuditService auditService;
+    private final BillingEventPublisher billingEventPublisher;
 
     @Transactional(readOnly = true)
     public List<DealResponse> findAll(UserPrincipal principal) {
@@ -144,6 +146,11 @@ public class DealService {
                 newStatus.getCode(),
                 principal.getId()
         );
+
+        if ("WON".equalsIgnoreCase(newStatus.getCode())
+                && !"WON".equalsIgnoreCase(oldStatusCode)) {
+            billingEventPublisher.publishDealWon(deal.getId(), principal.getId());
+        }
 
         return toResponse(deal);
     }
