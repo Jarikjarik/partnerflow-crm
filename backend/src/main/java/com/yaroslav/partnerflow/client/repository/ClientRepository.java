@@ -4,10 +4,15 @@ import com.yaroslav.partnerflow.client.entity.Client;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ClientRepository extends JpaRepository<Client, Long> {
 
-    List<Client> findByPartnerIdAndArchivedFalse(Long partnerId);
-
     List<Client> findByArchivedFalse();
+
+    List<Client> findByPartner_IdAndArchivedFalse(Long partnerId);
+
+    Optional<Client> findByIdAndArchivedFalse(Long id);
+
+    Optional<Client> findByPartner_IdAndIdAndArchivedFalse(Long partnerId, Long id);
 }
