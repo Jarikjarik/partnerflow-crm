@@ -15,4 +15,8 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
     Optional<Client> findByIdAndArchivedFalse(Long id);
 
     Optional<Client> findByPartner_IdAndIdAndArchivedFalse(Long partnerId, Long id);
+
+    long countByArchivedFalse();
+
+    long countByPartner_IdAndArchivedFalse(Long partnerId);
 }
