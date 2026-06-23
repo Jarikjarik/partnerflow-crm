@@ -1,5 +1,6 @@
 package com.yaroslav.partnerflow.deal.service;
 
+import com.yaroslav.partnerflow.audit.service.AuditService;
 import com.yaroslav.partnerflow.auth.security.UserPrincipal;
 import com.yaroslav.partnerflow.client.entity.Client;
 import com.yaroslav.partnerflow.client.repository.ClientRepository;
@@ -36,6 +37,7 @@ public class DealService {
     private final ClientRepository clientRepository;
     private final PartnerProfileRepository partnerProfileRepository;
     private final UserRepository userRepository;
+    private final AuditService auditService;
 
     @Transactional(readOnly = true)
     public List<DealResponse> findAll(UserPrincipal principal) {
@@ -77,13 +79,26 @@ public class DealService {
         deal.setAmount(request.amount());
         deal.setCreatedBy(createdBy);
 
-        return toResponse(dealRepository.save(deal));
+        Deal savedDeal = dealRepository.save(deal);
+
+        auditService.log(
+                "DEAL",
+                savedDeal.getId(),
+                "CREATED",
+                null,
+                null,
+                savedDeal.getTitle(),
+                principal.getId()
+        );
+
+        return toResponse(savedDeal);
     }
 
     @Transactional
     public DealResponse update(Long id, UpdateDealRequest request, UserPrincipal principal) {
         Deal deal = findDealForCurrentUser(id, principal);
 
+        String oldTitle = deal.getTitle();
         deal.setTitle(request.title());
         deal.setPropertyName(request.propertyName());
         deal.setBudget(request.budget());
@@ -93,6 +108,10 @@ public class DealService {
             deal.setAssignedManager(
                     request.assignedManagerId() == null ? null : getUser(request.assignedManagerId())
             );
+        }
+
+        if (!oldTitle.equals(deal.getTitle())) {
+            auditService.log("DEAL", deal.getId(), "UPDATED", "title", oldTitle, deal.getTitle(), principal.getId());
         }
 
         return toResponse(deal);
@@ -107,6 +126,7 @@ public class DealService {
         Deal deal = findDealForCurrentUser(id, principal);
         DealStatus newStatus = getStatus(request.statusCode());
 
+        String oldStatusCode = deal.getStatus().getCode();
         deal.setStatus(newStatus);
 
         if (newStatus.isFinalStatus()) {
@@ -114,6 +134,16 @@ public class DealService {
         } else {
             deal.setClosedAt(null);
         }
+
+        auditService.log(
+                "DEAL",
+                deal.getId(),
+                "STATUS_CHANGED",
+                "status",
+                oldStatusCode,
+                newStatus.getCode(),
+                principal.getId()
+        );
 
         return toResponse(deal);
     }

@@ -1,5 +1,6 @@
 package com.yaroslav.partnerflow.client.service;
 
+import com.yaroslav.partnerflow.audit.service.AuditService;
 import com.yaroslav.partnerflow.auth.security.UserPrincipal;
 import com.yaroslav.partnerflow.client.dto.ClientResponse;
 import com.yaroslav.partnerflow.client.dto.CreateClientRequest;
@@ -26,6 +27,7 @@ public class ClientService {
     private final ClientRepository clientRepository;
     private final PartnerProfileRepository partnerProfileRepository;
     private final UserRepository userRepository;
+    private final AuditService auditService;
 
     @Transactional(readOnly = true)
     public List<ClientResponse> findAll(UserPrincipal principal) {
@@ -74,12 +76,28 @@ public class ClientService {
             }
         }
 
-        return toResponse(clientRepository.save(client));
+        Client savedClient = clientRepository.save(client);
+
+        auditService.log(
+                "CLIENT",
+                savedClient.getId(),
+                "CREATED",
+                null,
+                null,
+                savedClient.getFullName(),
+                principal.getId()
+        );
+
+        return toResponse(savedClient);
     }
 
     @Transactional
     public ClientResponse update(Long id, UpdateClientRequest request, UserPrincipal principal) {
         Client client = findClientForCurrentUser(id, principal);
+
+        String oldFullName = client.getFullName();
+        String oldPhone = client.getPhone();
+        String oldEmail = client.getEmail();
 
         client.setFullName(request.fullName());
         client.setPhone(request.phone());
@@ -91,6 +109,18 @@ public class ClientService {
             client.setAssignedManager(request.assignedManagerId() == null ? null : getUser(request.assignedManagerId()));
         }
 
+        if (!oldFullName.equals(client.getFullName())) {
+            auditService.log("CLIENT", client.getId(), "UPDATED", "fullName", oldFullName, client.getFullName(), principal.getId());
+        }
+
+        if (!oldPhone.equals(client.getPhone())) {
+            auditService.log("CLIENT", client.getId(), "UPDATED", "phone", oldPhone, client.getPhone(), principal.getId());
+        }
+
+        if (oldEmail != null && !oldEmail.equals(client.getEmail()) || oldEmail == null && client.getEmail() != null) {
+            auditService.log("CLIENT", client.getId(), "UPDATED", "email", oldEmail, client.getEmail(), principal.getId());
+        }
+
         return toResponse(client);
     }
 
@@ -98,6 +128,15 @@ public class ClientService {
     public void archive(Long id, UserPrincipal principal) {
         Client client = findClientForCurrentUser(id, principal);
         client.setArchived(true);
+        auditService.log(
+                "CLIENT",
+                client.getId(),
+                "ARCHIVED",
+                "archived",
+                "false",
+                "true",
+                principal.getId()
+        );
     }
 
     private Client findClientForCurrentUser(Long id, UserPrincipal principal) {
